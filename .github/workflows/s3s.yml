@@ -2,7 +2,7 @@ name: Splatoon3 Battlelog Uplorder
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # 5分おき
+    - cron: '*/15 * * * *'  # 15分おき
   workflow_dispatch:
 
 jobs:
