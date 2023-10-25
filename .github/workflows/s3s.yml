@@ -1,0 +1,45 @@
+name: Splatoon3 Battlelog Uplorder
+
+on:
+  schedule:
+    - cron: '0 19 * * *'  # 朝4時
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:  # 適宜置換する
+      API_KEY: "infEyfKlr9UfIqtG1-fgPC4WbE1iSf25L6gnbScR31U"
+      ACC_LOC: "ja-JP|JP"
+      GTOKEN: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik5JZEQ3Y0stTUtKWTQxS2J2RkF5TzhRdVp3YyIsImprdSI6Imh0dHBzOi8vYXBpLWxwMS56bmMuc3J2Lm5pbnRlbmRvLm5ldC92MS9XZWJTZXJ2aWNlL0NlcnRpZmljYXRlL0xpc3QifQ.eyJpc0NoaWxkUmVzdHJpY3RlZCI6ZmFsc2UsImF1ZCI6IjY2MzM2NzcyOTE1NTI3NjgiLCJleHAiOjE2OTgyMjcyNzYsImlhdCI6MTY5ODIxNjQ3NiwiaXNzIjoiYXBpLWxwMS56bmMuc3J2Lm5pbnRlbmRvLm5ldCIsImp0aSI6ImQ1MWQwM2UzLThjOTMtNDhiYS04NmE5LWEzMTUzNzhiZTc1OCIsInN1YiI6NTEyNTE4NDU2MjY5MjA5NiwibGlua3MiOnsibmV0d29ya1NlcnZpY2VBY2NvdW50Ijp7ImlkIjoiNmQ5OTM4MDI3OGFiYjFiMiJ9fSwidHlwIjoiaWRfdG9rZW4iLCJtZW1iZXJzaGlwIjp7ImFjdGl2ZSI6dHJ1ZX19.IPlzEkxUGpIbNxRYRU55lcYBZ2Vnc2MdxDn-SMpQDoO5zLzdlNgoe4rG7bNZrSyZkQUMLJn9GacItcQfC9J6oYuSFhld8Qw3GlQQ1FwHprzRBrP38IS-LIar1fRxqBh-LUpy5tCI7b9tzuEvM59V1x9uopiSGIOM7MEge0BFxkydHYDLc0OTEuOiD9CXslzJLye3AobRmaNogDIpt7BMwctoAe14NCIwPKMAoTHu0HOBOfV2A2FzBfY5xp-2EnKCeFah4_Fu5uMI2-xWgfcBXM1INmTU2jKfS4n9t4laYb0zo-CGzgzATo6IXa7E_aRE78PYAyiiUU7EiFa3q9-TtQ"
+      BULLETTOKEN: "74YNaSlJ3QPMsHUvcvb5bB4o3R5RvvfXJZ759Ot74pyPjN5PmycpO7nDlhWmHDnpuCpUk0c5SN2f6ljqyqOlZ_cd8KuXQKZwFbrcvrajN_emYwcwK1aH5u531V0="
+      SESSION_TOKEN: "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLm5pbnRlbmRvLmNvbSIsImF1ZCI6IjcxYjk2M2MxYjdiNmQxMTkiLCJqdGkiOjExNzU3MjUwNzcyLCJzdWIiOiIyMmI4NGU1M2EyNTNiYzAwIiwiZXhwIjoxNzQyNzI5OTE5LCJzdDpzY3AiOlswLDgsOSwxNywyM10sImlhdCI6MTY3OTY1NzkxOSwidHlwIjoic2Vzc2lvbl90b2tlbiJ9.CC_WM-Yrm_E_AEB9BGEerhrsDfZzjztrx4lPT_ExouA"
+      F_GEN: "https://api.imink.app/f"
+
+    name: Splatoon3 Battlelog Uploader
+    steps:
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Checkout frozenpandaman/s3s
+        uses: actions/checkout@v3
+        with:
+          repository: 'frozenpandaman/s3s'
+          path: s3s
+
+      - name: Generate config.txt
+        working-directory: s3s
+        run: |
+          echo '{"api_key": "${{ env.API_KEY }}", "acc_loc": "${{ env.ACC_LOC }}", "gtoken": "${{ env.GTOKEN }}", "bullettoken": "${{ env.BULLETTOKEN }}", "session_token": "${{ env.SESSION_TOKEN }}", "f_gen": "${{ env.F_GEN }}" }' > config.txt
+          cat config.txt
+      - name: Install s3s requirements
+        working-directory: s3s
+        run: |
+          pip install -r requirements.txt
+      - name: Run s3s
+        working-directory: s3s
+        run: |
+          python3 s3s.py -nsr -r
+          # python3 s3s.py -osr -r
